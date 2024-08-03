@@ -1,0 +1,37 @@
+{
+  "name": "routing",
+  "version": "1.0.0",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.1",
+    "save": "^2.9.0"
+  },
+  "description": "router",
+  "main": "index.js",
+  "devDependencies": {
+    "nodemon": "^3.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asrorjonsportfolio/routing.git"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "router"
+  ],
+  "author": "Asrorjon Mukhtorov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asrorjonsportfolio/routing/issues"
+  },
+  "homepage": "https://github.com/asrorjonsportfolio/routing#readme"
+}
