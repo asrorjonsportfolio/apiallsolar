@@ -13,8 +13,7 @@ app.use(
         extended: true,
     }),
 );
-// app.use(cors({origin: 'https://allsolar.xyz'}));
-app.use(cors({origin: 'http://localhost:3000'}));
+app.use(cors({origin: 'https://allsolar.xyz'}));
 app.use("/solarman", bodyParser.json(), routerS);
 app.use("/hopecloud", bodyParser.json(), routerH);
 app.use("/foxess", bodyParser.json(), routerF);
