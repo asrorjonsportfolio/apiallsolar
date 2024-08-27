@@ -429,5 +429,55 @@ module.exports = {
             "method": "POST"
         });
         return await currentData.json();
+    },
+    getPowerCapacityByUserId: async function () {
+        let login = await fetch("http://localhost:8080/hopecloud/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                loginWay: 1,
+                loginType: "pc",
+                captchaBO: {},
+                password: "22081997Bnpz",
+                userName: "BNPZsolar"
+            })
+        });
+        let dataLogin = await login.json();
+        let powerCapacity = await fetch("https://hopewindcloud.eu/api/monitor/user/getPowerCapacityByUserId", {
+            "headers": {
+                "accept": "application/json, text/plain, */*",
+                "accept-language": "en,en-US;q=0.9,sk;q=0.8,ru;q=0.7",
+                "appkeylist": "APP_PVCLOUD",
+                "applicationid": "1681654280392097797",
+                "apptype": "web",
+                "appversion": "V4.7.0",
+                "content-type": "application/json",
+                "graytype": "green",
+                "lang": "en_US",
+                "permissioncode": "HopecloudOverview",
+                "priority": "u=1, i",
+                "requesthost": "hopewindcloud.eu",
+                "routerurl": "/hopecloud/overview/index",
+                "sec-ch-ua": "\"Not)A;Brand\";v=\"99\", \"Microsoft Edge\";v=\"127\", \"Chromium\";v=\"127\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "empty",
+                "sec-fetch-mode": "cors",
+                "sec-fetch-site": "same-origin",
+                "systemtimezone": "+05:00",
+                "tenantid": "000001",
+                "token": `${dataLogin.msg.result.token}`,
+                "userid": `${dataLogin.msg.result.id}`,
+                "Referer": "https://hopewindcloud.eu/",
+                "Referrer-Policy": "strict-origin-when-cross-origin"
+            },
+            "body": JSON.stringify({
+                userId: dataLogin.msg.result.id
+            }),
+            "method": "POST"
+        });
+        return await powerCapacity.json();
     }
 }

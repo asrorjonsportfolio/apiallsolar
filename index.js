@@ -13,7 +13,7 @@ app.use(
         extended: true,
     }),
 );
-app.use(cors({origin: process.env.ORIGIN}));
+app.use(cors({origin: "http://localhost:3000"}));
 app.use("/solarman", bodyParser.json(), routerS);
 app.use("/hopecloud", bodyParser.json(), routerH);
 app.use("/foxess", bodyParser.json(), routerF);

@@ -4,7 +4,7 @@ const {callMongo, config, findOne, updateOne, insertOne} = require("../mongo");
 const {getDeviceList, getCurrentData} = require("../foxess/foxess");
 const routerF = express.Router();
 const token = "76dd21b5-6925-406b-be9c-b6773f053ee8"
-require("dotenv").config({path: "./env.json"});
+require("dotenv").config({path: "../.env"});
 
 routerF.post('/getDeviceList', (req, res) => {
     getDeviceList()

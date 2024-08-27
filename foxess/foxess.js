@@ -1,4 +1,4 @@
-const token = "76dd21b5-6925-406b-be9c-b6773f053ee8"
+const token = process.env.FOXESS_TOKEN;
 let crypto = require("crypto");
 var Md5 = class _Md5 {
     constructor() {
@@ -352,6 +352,7 @@ var Md5 = class _Md5 {
         return raw ? this._state : _Md5._hex(this._state);
     }
 };
+require("dotenv").config({path: "../.env"});
 Md5.stateIdentity = new Int32Array([1732584193, -271733879, -1732584194, 271733878]);
 Md5.buffer32Identity = new Int32Array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 Md5.hexChars = "0123456789abcdef";

@@ -1,5 +1,5 @@
 const {createHash} = require('crypto');
-const {response} = require("express");
+require("dotenv").config();
 
 module.exports = {
     login: async function (username, password, appSecret) {
@@ -16,12 +16,13 @@ module.exports = {
         });
         return await response.json();
     },
-    getStationList: async function (token) {
+    getStationList: async function (access_token) {
+        let token = process.env.ACCESS_TOKEN;
         const response = await fetch("https://globalhome.solarmanpv.com/maintain-s/operating/station/search?order.direction=DESC&order.property=id&page=1&size=20", {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en,en-US;q=0.9,sk;q=0.8,ru;q=0.7",
-                "authorization": `Bearer ${token}`,
+                "authorization": `Bearer ${access_token}`,
                 "cache-control": "no-cache",
                 "content-type": "application/json;charset=UTF-8",
                 "pragma": "no-cache",
@@ -41,12 +42,13 @@ module.exports = {
         });
         return await response.json();
     },
-    getDeviceList: async function (stationId, token) {
+    getDeviceList: async function (stationId, access_token) {
+        let token = process.env.ACCESS_TOKEN;
         const response = await fetch(`https://globalhome.solarmanpv.com/maintain-s/fast/device/${stationId}/device-list?deviceType=INVERTER`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en,en-US;q=0.9,sk;q=0.8,ru;q=0.7",
-                "authorization": `Bearer ${token}`,
+                "authorization": `Bearer ${access_token}`,
                 "cache-control": "no-cache",
                 "pragma": "no-cache",
                 "priority": "u=1, i",
@@ -65,11 +67,11 @@ module.exports = {
         });
         return await response.json();
     },
-    getCurrentData: async function (deviceSn, token) {
+    getCurrentData: async function (deviceSn, access_token) {
         const response = await fetch('https://globalapi.solarmanpv.com/device/v1.0/currentData', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${access_token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -78,11 +80,11 @@ module.exports = {
         });
         return await response.json();
     },
-    getHistoryData: async (deviceSn, token, timeType, startTime, endTime) => {
+    getHistoryData: async (deviceSn, timeType, startTime, endTime, access_token) => {
         let response = await fetch(`https://globalapi.solarmanpv.com/device/v1.0/historical`, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                'Authorization': `Bearer ${access_token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -94,12 +96,12 @@ module.exports = {
         });
         return await response.json();
     },
-    getHistoryDataGlobal: async (deviceId, token, startTime, key) => {
+    getHistoryDataGlobal: async (deviceId, startTime, key, access_token) => {
         let response = await fetch(`https://globalhome.solarmanpv.com/device-s/device/${deviceId}/stats/day?showParams=${key}&lan=en&day=${startTime}&showParams[]=${key}`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en,en-US;q=0.9,sk;q=0.8,ru;q=0.7",
-                "authorization": `Bearer ${token}`,
+                "authorization": `Bearer ${access_token}`,
                 "cache-control": "no-cache",
                 "pragma": "no-cache",
                 "priority": "u=1, i",
@@ -118,12 +120,12 @@ module.exports = {
         });
         return await response.json();
     },
-    getHistoryDataHybrid: async (deviceId, token, startTime, key) => {
+    getHistoryDataHybrid: async (deviceId, startTime, key, access_token) => {
         let response = await fetch(`https://globalhome.solarmanpv.com/device-s/device/${deviceId}/stats/day?showParams=${key}&lan=en&day=${startTime}&showParams[]=${key}`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
                 "accept-language": "en,en-US;q=0.9,sk;q=0.8,ru;q=0.7",
-                "authorization": `Bearer ${token}`,
+                "authorization": `Bearer ${access_token}`,
                 "cache-control": "no-cache",
                 "pragma": "no-cache",
                 "priority": "u=1, i",
