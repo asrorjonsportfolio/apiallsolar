@@ -1,5 +1,3 @@
-const {response} = require("express");
-const {getDeviceList} = require("../solarman/solarman");
 module.exports = {
     login: async function (loginWay, loginType, captchaBO, password, userName) {
         let response = await fetch("https://hopewindcloud.eu/api/auth/sysAuth/login", {

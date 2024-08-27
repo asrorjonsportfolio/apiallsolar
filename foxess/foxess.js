@@ -1,5 +1,4 @@
 const token = process.env.FOXESS_TOKEN;
-let crypto = require("crypto");
 var Md5 = class _Md5 {
     constructor() {
         this._dataLength = 0;

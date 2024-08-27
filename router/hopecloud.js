@@ -10,7 +10,6 @@ const {
 } = require("../hopecloud/hopecloud");
 const {callMongo, config, findOne, updateOne, insertOne} = require("../mongo");
 const routerH = express.Router();
-const access_token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX25hbWUiOiIwX0JOUFpzb2xhckBnbWFpbC5jb21fMyIsInNjb3BlIjpbImFsbCJdLCJkZXRhaWwiOnsib3JnYW5pemF0aW9uSWQiOjAsInRvcEdyb3VwSWQiOm51bGwsImdyb3VwSWQiOm51bGwsInJvbGVJZCI6LTEsInVzZXJJZCI6MTM2NjkxNjUsInZlcnNpb24iOjEwMDAsImlkZW50aWZpZXIiOiJCTlBac29sYXJAZ21haWwuY29tIiwiaWRlbnRpdHlUeXBlIjozLCJtZGMiOiJGT1JFSUdOXzEiLCJhcHBJZCI6IjMwMjMwOTI2MTQxNjE3MTYifSwiZXhwIjoxNzI3MTU1NDMxLCJtZGMiOiJGT1JFSUdOXzEiLCJhdXRob3JpdGllcyI6WyJhbGwiXSwianRpIjoiOTM4MzZjNTctNTZhMy00YWUxLTlhMjEtZDBmMjY5ODhjOTk2IiwiY2xpZW50X2lkIjoidGVzdCJ9.PVQUtQ6wMllejs8lYm8V6LuhdTVD0X7M9byaqU-H3TFavq2JIWXWcXspyybN3paNb5yJ_3zNH1Em376gjjwlLza_I1rhh0vpAgJx2w6UwwrvulxJVqz7bPlZadFWc29BiHCEwYTrVLDU6-3S3mDd0QM27FXxa-ByiBxaF6N3Vn4414F9s5GRRr7re6cn7OboD5NrMxbuCW76hD2LxLcDHJB2PVv52m0kG6K4fCfyxanlRhgD9QP-U5fBWO-bE-N2K8r2c2W81O4HK9UTxxck-ML3_bCP5jBYz9OCfTJmIDQHjBDrxfnhsQsm_lYPwhWIO9Js5mDhu679B_rH6hEA4Q";
 require("dotenv").config({path: "../.env"});
 
 routerH.post('/login', (req, res) => {
