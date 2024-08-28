@@ -9,6 +9,11 @@ const {
 } = require("../solarman/solarman");
 const {callMongo, config, findOne, updateOne, insertOne} = require("../mongo");
 const routerS = express.Router();
+const swaggerUi = require('swagger-ui-express');
+4
+const swaggerDocument = require('../swagger.json');
+routerS.use('/api-docs', swaggerUi.serve);
+routerS.get('/api-docs', swaggerUi.setup(swaggerDocument));
 require("dotenv").config({path: "../.env"});
 
 routerS.post('/login', (req, res) => {
@@ -26,6 +31,15 @@ routerS.post('/login', (req, res) => {
         })
         .catch(error => res.status(401).send(error));
 });
+/**
+ * @swagger
+ * /getStationList:
+ *   get:
+ *     summary: stansiyalar ro`yxatini oladi
+ *     responses:
+ *       200:
+ *         description: stansiyalar ro`yxatini qaytaradi
+ */
 routerS.post('/getStationList', (req, res) => {
     let access_token = "";
     login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
@@ -69,7 +83,7 @@ routerS.post('/getCurrentData', (req, res) => {
             getCurrentData(deviceSn, access_token)
                 .then(async (result) => {
                     const dataList = result.dataList;
-                    res.status(200).send({msg: dataList});
+                    res.status(200).send({msg: result});
                 })
                 .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}));
         })
@@ -116,101 +130,83 @@ routerS.post('/getHistoryDataHybrid', (req, res) => {
                 .catch(error => console.log('gethistorydata error', error));
         })
 });
-routerS.post('/getStationListMongo', (req, res) => {
-    const {dataSource, database, collection, filter, sort} = req.body;
-    const findConfig = config('POST', 'find', findOne(dataSource, database, collection, filter, sort));
-    callMongo(findConfig)
-        .then(async response => {
-            let data = await response.data;
-            res.status(200).send(data);
+
+routerS.post('/getRealTimeData', (req, res) => {
+    const {deviceSn} = req.body;
+    console.log(deviceSn)
+    let access_token = "";
+    login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
+        .then((result) => {
+            access_token = result.access_token;
+            console.log(access_token)
         })
-        .catch(error => res.status(401).send({msg: 'getstationlistmongo error', error}));
-});
-routerS.post('/getDeviceListMongo', (req, res) => {
-    const {dataSource, database, collection, filter, sort} = req.body;
-    const findConfig = config('POST', 'find', findOne(dataSource, database, collection, filter, sort));
-    callMongo(findConfig)
-        .then(async response => {
-            let data = await response.data;
-            res.status(200).send(data);
-        })
-        .catch(error => res.status(401).send({msg: 'getdevicelistmongo error', error}));
-});
-routerS.post('/getCurrentDataMongo', (req, res) => {
-    const {dataSource, database, collection, filter, sort} = req.body;
-    const findConfig = config('POST', 'find', findOne(dataSource, database, collection, filter, sort));
-    callMongo(findConfig)
-        .then(async response => {
-            let data = await response.data;
-            res.status(200).send(data);
-        })
-        .catch(error => res.status(401).send({msg: 'getcurrentdatamongo error', error}));
-});
-routerS.post('/collectData', (req, res) => {
-    const access_token = req.body.access_token;
-    let stationList = [];
-    const first = () => {
-        getStationList(access_token)
-            .then((response) => {
-                response.data.forEach((station) => {
-                    stationList.push(station.id);
-                });
-                console.log(stationList);
-                fetch('http://localhost:8080/solarman/getStationList', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        access_token
-                    })
+        .catch(error => res.status(401).send(error))
+        .finally(() => {
+            let currentData;
+            getCurrentData(deviceSn, access_token)
+                .then(async (result) => {
+                    currentData = result;
+                    console.log(currentData)
                 })
-                    .then(response => {
-                        stationList.forEach((stationId) => {
-                            getDeviceList(stationId, access_token)
-                                .then((response) => {
-                                    console.log(response);
-                                    let deviceList = [];
-                                    response.forEach((inverter) => {
-                                        deviceList.push(inverter.deviceSn);
-                                    })
-                                    console.log('deviceList: ', deviceList);
-                                    fetch('http://localhost:8080/solarman/getDeviceList', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json'
-                                        },
-                                        body: JSON.stringify({
-                                            access_token,
-                                            stationId
-                                        })
-                                    })
-                                        .then(response => {
-                                            deviceList.forEach((deviceSn) => {
-                                                fetch('http://localhost:8080/solarman/getCurrentData', {
-                                                    method: 'POST',
-                                                    headers: {
-                                                        'Content-Type': 'application/json'
-                                                    },
-                                                    body: JSON.stringify({
-                                                        access_token,
-                                                        deviceSn
-                                                    })
-                                                })
-                                                    .then(async response => await response.json())
-                                                    .then(data => console.log(data))
-                                                    .catch(error => console.log('collectdata getcurrentdata error:', error));
-                                            });
-                                            deviceList = [];
-                                        })
-                                        .catch(error => console.log('collectdata getdevicelist error:', error));
-                                })
-                        });
+                .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
+                .finally(() => {
+                    res.status(200).send({
+                        "inverter_sn": deviceSn,
+                        "power": currentData.deviceSn,
+                        "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
+                        "energy_change": "",
+                        "date": currentData.collectionTime,
+                        "export_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
+                        "import_energy": currentData.dataList.find(e => e.key === "Etdy_use1").value,
+                        "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1").value,
+                        "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2").value,
+                        "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3").value,
+                        "temperature": currentData.dataList.find(e => e.key === "T_boost1").value,
+                        "alarm_code": currentData.dataList.find(e => e.key === "Fault_Code1").value,
+                        "pv1": currentData.dataList.find(e => e.key === "DV1").value,
+                        "pv2": currentData.dataList.find(e => e.key === "DV2").value,
+                        "pv3": currentData.dataList.find(e => e.key === "DV3").value,
+                        "pv4": currentData.dataList.find(e => e.key === "DV4").value,
+                        "pv5": currentData.dataList.find(e => e.key === "DV5").value,
+                        "pv6": currentData.dataList.find(e => e.key === "DV6").value,
+                        "pv7": currentData.dataList.find(e => e.key === "DV7").value,
+                        "pv8": currentData.dataList.find(e => e.key === "DV8").value,
+                        "pv9": currentData.dataList.find(e => e.key === "DV9").value,
+                        "pv10": currentData.dataList.find(e => e.key === "DV10").value,
+                        "pv11": currentData.dataList.find(e => e.key === "DV11").value,
+                        "pv12": currentData.dataList.find(e => e.key === "DV12").value,
+                        "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
+                        "location_uid": currentData.deviceId
                     })
-                    .catch(error => console.log('collectdata getstationlist error:', error));
-            })
-            .catch(error => res.status(401).send({msg: 'getstationlist error', error}));
-    }
-    first();
+                });
+        })
 });
+
+routerS.post('/getDeviceData', (req, res) => {
+    const {deviceSn} = req.body;
+    console.log(deviceSn)
+    let access_token = "";
+    login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
+        .then((result) => {
+            access_token = result.access_token;
+            console.log(access_token)
+        })
+        .catch(error => res.status(401).send(error))
+        .finally(() => {
+            let stationList;
+            getStationList(access_token)
+                .then(async (result) => {
+                    stationList = result;
+                })
+                .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
+                .finally(() => {
+                    res.status(200).send({
+                        "inverter_uuid": stationList.deviceId,
+                        "serial_number": deviceSn,
+                        "name": stationList.data
+                    })
+                });
+        })
+});
+
 module.exports = routerS;
