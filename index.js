@@ -1,5 +1,5 @@
 const express = require('express');
-// const cors = require('cors');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const routerS = require('./router/solarman');
 const routerH = require('./router/hopecloud');
@@ -19,8 +19,7 @@ app.use(
 //     allowedHeaders: ['Content-Type', 'Authorization'] // Allow specific headers
 // }));
 // server.js
-let cors = require('./cors');
-app.use(cors());
+app.use(cors({origin: "http://localhost:3000"}));
 app.use("/solarman", bodyParser.json(), routerS);
 app.use("/hopecloud", bodyParser.json(), routerH);
 app.use("/foxess", bodyParser.json(), routerF);
