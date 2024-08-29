@@ -184,16 +184,20 @@ routerS.post('/getDeviceData', (req, res) => {
                     .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
                     .finally(() => {
                         let json = [];
-                        deviceList.forEach((device) => {
-                            json.push({
-                                "inverter_uuid": device.deviceId,
-                                "serial_number": device.deviceSn,
-                                "status": device.deviceStatus,
-                                "name": device.deviceName,
-                                "power": device.deviceName.match(/\/(\d+)/)[1],
-                                "location_uid": device.stationId,
-                            })
-                        });
+                        try {
+                            deviceList.forEach((device) => {
+                                json.push({
+                                    "inverter_uuid": device.deviceId,
+                                    "serial_number": device.deviceSn,
+                                    "status": device.deviceStatus,
+                                    "name": device.deviceName,
+                                    "power": device.deviceName.match(/\/(\d+)/)[1],
+                                    "location_uid": device.stationId,
+                                })
+                            });
+                        } catch (e) {
+                            console.log(e);
+                        }
                         res.status(200).send(json)
                     });
             });
