@@ -165,37 +165,41 @@ routerS.post('/getRealTimeData', (req, res) => {
 });
 
 routerS.post('/getDeviceData', (req, res) => {
-    const {stationId} = req.body;
-    console.log(stationId)
-    let access_token = "";
-    login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
-        .then((result) => {
-            access_token = result.access_token;
-            console.log(access_token)
-        })
-        .catch(error => res.status(401).send(error))
-        .finally(() => {
-            let deviceList;
-            getDeviceList(stationId, access_token)
-                .then(async (result) => {
-                    deviceList = result;
-                })
-                .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
-                .finally(() => {
-                    let json = [];
-                    deviceList.forEach((device) => {
-                        json.push({
-                            "inverter_uuid": device.deviceId,
-                            "serial_number": device.deviceSn,
-                            "status": device.deviceStatus,
-                            "name": device.deviceName,
-                            "power": device.deviceName.match(/\/(\d+)/)[1],
-                            "location_uid": device.stationId,
-                        })
+    try {
+        const {stationId} = req.body;
+        console.log(stationId)
+        let access_token = "";
+        login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
+            .then((result) => {
+                access_token = result.access_token;
+                console.log(access_token)
+            })
+            .catch(error => res.status(401).send(error))
+            .finally(() => {
+                let deviceList;
+                getDeviceList(stationId, access_token)
+                    .then(async (result) => {
+                        deviceList = result;
+                    })
+                    .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
+                    .finally(() => {
+                        let json = [];
+                        deviceList.forEach((device) => {
+                            json.push({
+                                "inverter_uuid": device.deviceId,
+                                "serial_number": device.deviceSn,
+                                "status": device.deviceStatus,
+                                "name": device.deviceName,
+                                "power": device.deviceName.match(/\/(\d+)/)[1],
+                                "location_uid": device.stationId,
+                            })
+                        });
+                        res.status(200).send(json)
                     });
-                    res.status(200).send(json)
-                });
-        });
+            });
+    } catch (e) {
+        console.log(e)
+    }
 });
 
 module.exports = routerS;
