@@ -202,7 +202,6 @@ routerS.post('/getDeviceData', (req, res) => {
             });
     } catch (e) {
         console.log(e)
-        res.status(401).send({msg: "stationId might be wrong", e});
     }
 });
 
