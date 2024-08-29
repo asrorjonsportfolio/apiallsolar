@@ -121,7 +121,6 @@ routerS.post('/getRealTimeData', (req, res) => {
     login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
         .then((result) => {
             access_token = result.access_token;
-            console.log(access_token)
         })
         .catch(error => res.status(401).send(error))
         .finally(() => {
@@ -172,7 +171,6 @@ routerS.post('/getDeviceData', (req, res) => {
         login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
             .then((result) => {
                 access_token = result.access_token;
-                console.log(access_token)
             })
             .catch(error => res.status(401).send(error))
             .finally(() => {
