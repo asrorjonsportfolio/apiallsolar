@@ -140,38 +140,43 @@ routerH.post('/getDeviceData', (req, res) => {
     const {stationId} = req.body;
     console.log(stationId)
     let access_token = "";
-    login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
-        .then((result) => {
-            access_token = result.access_token;
-        })
-        .catch(error => res.status(401).send(error))
-        .finally(() => {
-            let deviceList;
-            getDeviceList(stationId, access_token)
-                .then(async (result) => {
-                    deviceList = result;
-                })
-                .catch(error => res.status(401).send({msg: 'getDeviceList error:', error}))
-                .finally(() => {
-                    let json = [];
-                    try {
-                        deviceList.forEach((device) => {
-                            json.push({
-                                "inverter_uuid": device.deviceId,
-                                "serial_number": device.deviceSn,
-                                "status": device.deviceStatus,
-                                "name": device.deviceName,
-                                "power": device.deviceName.match(/\/(\d+)/)[1],
-                                "location_uid": device.stationId,
-                            })
-                        });
-                    } catch (e) {
-                        console.log(e);
-                        res.status(401).send({msg: 'stationId might be wrong:', e})
-                    }
-                    res.status(200).send(json)
-                });
-        });
+    try {
+        login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
+            .then((result) => {
+                access_token = result.access_token;
+            })
+            .catch(error => res.status(401).send(error))
+            .finally(() => {
+                let deviceList;
+                getDeviceList(stationId, access_token)
+                    .then(async (result) => {
+                        deviceList = result;
+                    })
+                    .catch(error => res.status(401).send({msg: 'getDeviceList error:', error}))
+                    .finally(() => {
+                        let json = [];
+                        try {
+                            deviceList.forEach((device) => {
+                                json.push({
+                                    "inverter_uuid": device.deviceId,
+                                    "serial_number": device.deviceSn,
+                                    "status": device.deviceStatus,
+                                    "name": device.deviceName,
+                                    "power": device.deviceName.match(/\/(\d+)/)[1],
+                                    "location_uid": device.stationId,
+                                })
+                            });
+                        } catch (e) {
+                            console.log(e);
+                            res.status(401).send({msg: 'stationId might be wrong:', e})
+                        }
+                        res.status(200).send(json)
+                    });
+            });
+    } catch (e) {
+        console.log(e);
+        res.status(401).send({msg: "stationId might be wrong", e});
+    }
 });
 
 // routerS.post('/getHistoryDataGlobal', (req, res) => {

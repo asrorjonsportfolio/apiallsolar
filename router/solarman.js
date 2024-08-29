@@ -179,7 +179,7 @@ routerS.post('/getDeviceData', (req, res) => {
                     .then(async (result) => {
                         deviceList = result;
                     })
-                    .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
+                    .catch(error => res.status(401).send({msg: 'getDeviceList error:', error}))
                     .finally(() => {
                         let json = [];
                         try {
@@ -195,12 +195,14 @@ routerS.post('/getDeviceData', (req, res) => {
                             });
                         } catch (e) {
                             console.log(e);
+                            res.status(401).send({msg: "stationId might be wrong", e});
                         }
                         res.status(200).send(json)
                     });
             });
     } catch (e) {
         console.log(e)
+        res.status(401).send({msg: "stationId might be wrong", e});
     }
 });
 
