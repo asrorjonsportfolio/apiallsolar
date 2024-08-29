@@ -181,8 +181,8 @@ routerS.post('/getDeviceData', (req, res) => {
                     })
                     .catch(error => res.status(401).send({msg: 'getDeviceList error:', error}))
                     .finally(() => {
-                        let json = [];
                         try {
+                            let json = [];
                             deviceList.forEach((device) => {
                                 json.push({
                                     "inverter_uuid": device.deviceId,
@@ -193,11 +193,11 @@ routerS.post('/getDeviceData', (req, res) => {
                                     "location_uid": device.stationId,
                                 })
                             });
+                            res.status(200).send(json)
                         } catch (e) {
                             console.log(e);
                             res.status(401).send({msg: "stationId might be wrong", e});
                         }
-                        res.status(200).send(json)
                     });
             });
     } catch (e) {
