@@ -2,18 +2,11 @@ const express = require("express");
 const {
     login,
     getDeviceList,
-    currentData,
     getStationList,
     getCurrentData,
     getHistoryData, getHistoryDataGlobal, getHistoryDataHybrid
 } = require("../solarman/solarman");
-const {callMongo, config, findOne, updateOne, insertOne} = require("../mongo");
 const routerS = express.Router();
-const swaggerUi = require('swagger-ui-express');
-4
-const swaggerDocument = require('../swagger.json');
-routerS.use('/api-docs', swaggerUi.serve);
-routerS.get('/api-docs', swaggerUi.setup(swaggerDocument));
 require("dotenv").config({path: "../.env"});
 
 routerS.post('/login', (req, res) => {
@@ -31,15 +24,6 @@ routerS.post('/login', (req, res) => {
         })
         .catch(error => res.status(401).send(error));
 });
-/**
- * @swagger
- * /getStationList:
- *   get:
- *     summary: stansiyalar ro`yxatini oladi
- *     responses:
- *       200:
- *         description: stansiyalar ro`yxatini qaytaradi
- */
 routerS.post('/getStationList', (req, res) => {
     let access_token = "";
     login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
@@ -82,7 +66,6 @@ routerS.post('/getCurrentData', (req, res) => {
         .finally(() => {
             getCurrentData(deviceSn, access_token)
                 .then(async (result) => {
-                    const dataList = result.dataList;
                     res.status(200).send({msg: result});
                 })
                 .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}));
