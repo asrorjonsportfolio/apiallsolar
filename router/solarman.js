@@ -146,7 +146,6 @@ routerS.post('/getRealTimeData', (req, res) => {
             getCurrentData(deviceSn, access_token)
                 .then(async (result) => {
                     currentData = result;
-                    console.log(currentData)
                 })
                 .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
                 .finally(() => {
@@ -179,12 +178,12 @@ routerS.post('/getRealTimeData', (req, res) => {
                         "location_uid": currentData.deviceId
                     })
                 });
-        })
+        });
 });
 
 routerS.post('/getDeviceData', (req, res) => {
-    const {deviceSn} = req.body;
-    console.log(deviceSn)
+    const {stationId} = req.body;
+    console.log(stationId)
     let access_token = "";
     login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
         .then((result) => {
@@ -193,20 +192,27 @@ routerS.post('/getDeviceData', (req, res) => {
         })
         .catch(error => res.status(401).send(error))
         .finally(() => {
-            let stationList;
-            getStationList(access_token)
+            let deviceList;
+            getDeviceList(stationId, access_token)
                 .then(async (result) => {
-                    stationList = result;
+                    deviceList = result;
                 })
                 .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
                 .finally(() => {
-                    res.status(200).send({
-                        "inverter_uuid": stationList.deviceId,
-                        "serial_number": deviceSn,
-                        "name": stationList.data
-                    })
+                    let json = [];
+                    deviceList.forEach((device) => {
+                        json.push({
+                            "inverter_uuid": device.deviceId,
+                            "serial_number": device.deviceSn,
+                            "status": device.deviceStatus,
+                            "name": device.deviceName,
+                            "power": device.deviceName.match(/\/(\d+)/)[1],
+                            "location_uid": device.stationId,
+                        })
+                    });
+                    res.status(200).send(json)
                 });
-        })
+        });
 });
 
 module.exports = routerS;
