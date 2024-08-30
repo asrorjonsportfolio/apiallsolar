@@ -132,8 +132,9 @@ routerS.post('/getRealTimeData', (req, res) => {
                 .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
                 .finally(() => {
                     res.status(200).send({
+                        "type": "invt",
                         "inverter_sn": deviceSn,
-                        "power": currentData.deviceSn,
+                        "power": currentData.dataList.find(e => e.key === "Pr1").value,
                         "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
                         "energy_change": "",
                         "date": currentData.collectionTime,
