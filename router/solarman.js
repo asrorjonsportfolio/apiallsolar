@@ -206,4 +206,57 @@ routerS.post('/getDeviceData', (req, res) => {
     }
 });
 
+routerS.post('/getStationByDevice', (req, res) => {
+    try {
+        const {deviceSn} = req.body;
+        let access_token = "";
+        login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
+            .then((result) => {
+                access_token = result.access_token;
+            })
+            .catch(error => res.status(401).send(error))
+            .finally(() => {
+                let stationList;
+                let deviceList;
+                getStationList(access_token)
+                    .then((result) => {
+                        stationList = result.data;
+                    })
+                    .catch(error => res.status(401).send({msg: 'getDeviceList error:', error}))
+                    .finally(() => {
+                        try {
+                            stationList.data.forEach((station) => {
+                                getDeviceList(station.id, access_token)
+                                    .then((result) => {
+                                        deviceList = result.data;
+                                        let device = deviceList.find(e => e.deviceSn === deviceSn);
+                                        if (device) {
+                                            console.log(station.name);
+                                            res.status(200).send(station.name);
+                                        }
+                                    })
+                                    .catch(e => console.log(e));
+                            })
+                            // let json = [];
+                            // deviceList.forEach((device) => {
+                            //     json.push({
+                            //         "inverter_uuid": device.deviceId,
+                            //         "serial_number": device.deviceSn,
+                            //         "status": device.deviceStatus,
+                            //         "name": device.deviceName,
+                            //         "power": device.deviceName.match(/\/(\d+)/)[1],
+                            //         "location_uid": device.stationId,
+                            //     })
+                            // });
+                            // res.status(200).send()
+                        } catch (e) {
+                            console.log(e);
+                            res.status(401).send({msg: "stationId might be wrong", e});
+                        }
+                    });
+            });
+    } catch (e) {
+        console.log(e)
+    }
+});
 module.exports = routerS;
