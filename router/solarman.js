@@ -131,35 +131,67 @@ routerS.post('/getRealTimeData', (req, res) => {
                 })
                 .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
                 .finally(() => {
-                    res.status(200).send({
-                        "type": "invt",
-                        "inverter_sn": deviceSn,
-                        "power": currentData.dataList.find(e => e.key === "Pr1").value,
-                        "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
-                        "energy_change": "",
-                        "date": currentData.collectionTime,
-                        "export_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
-                        "import_energy": currentData.dataList.find(e => e.key === "Etdy_use1").value,
-                        "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1").value,
-                        "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2").value,
-                        "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3").value,
-                        "temperature": currentData.dataList.find(e => e.key === "T_boost1").value,
-                        "alarm_code": currentData.dataList.find(e => e.key === "Fault_Code1").value,
-                        "pv1": currentData.dataList.find(e => e.key === "DV1").value,
-                        "pv2": currentData.dataList.find(e => e.key === "DV2").value,
-                        "pv3": currentData.dataList.find(e => e.key === "DV3").value,
-                        "pv4": currentData.dataList.find(e => e.key === "DV4").value,
-                        "pv5": currentData.dataList.find(e => e.key === "DV5").value,
-                        "pv6": currentData.dataList.find(e => e.key === "DV6").value,
-                        "pv7": currentData.dataList.find(e => e.key === "DV7").value,
-                        "pv8": currentData.dataList.find(e => e.key === "DV8").value,
-                        "pv9": currentData.dataList.find(e => e.key === "DV9").value,
-                        "pv10": currentData.dataList.find(e => e.key === "DV10").value,
-                        "pv11": currentData.dataList.find(e => e.key === "DV11").value,
-                        "pv12": currentData.dataList.find(e => e.key === "DV12").value,
-                        "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
-                        "location_uid": currentData.deviceId
+                    let stationName = "";
+                    let deviceName = "";
+                    let hybrid = false;
+                    let status = 1;
+                    fetch("http://localhost:8080/solarman/getStationByDevice", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            deviceSn
+                        })
                     })
+                        .then(async result => {
+                            result = await result.json();
+                            stationName = result.station;
+                            hybrid = result.hybrid;
+                            deviceName = result.name;
+                            status = result.status;
+                        })
+                        .catch(e => console.log(e))
+                        .finally(() => {
+                            const regex = /Inverter[-\d]*\s+(\w+)\s*\(\d+\)/;
+                            const type = deviceName.match(regex);
+                            console.log(type)
+                            if (hybrid === false) {
+                                res.status(200).send({
+                                    "type": type[1],
+                                    "hybrid": hybrid,
+                                    "station_name": stationName,
+                                    "inverter_name": deviceName,
+                                    "inverter_sn": deviceSn,
+                                    "status": status,
+                                    "power": currentData.dataList.find(e => e.key === "Pr1").value,
+                                    "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
+                                    "energy_change": "",
+                                    "date": currentData.collectionTime,
+                                    "export_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
+                                    "import_energy": currentData.dataList.find(e => e.key === "Etdy_use1").value,
+                                    "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1").value,
+                                    "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2").value,
+                                    "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3").value,
+                                    "temperature": currentData.dataList.find(e => e.key === "T_boost1").value,
+                                    "alarm_code": currentData.dataList.find(e => e.key === "Fault_Code1").value,
+                                    "pv1": currentData.dataList.find(e => e.key === "DV1").value,
+                                    "pv2": currentData.dataList.find(e => e.key === "DV2").value,
+                                    "pv3": currentData.dataList.find(e => e.key === "DV3").value,
+                                    "pv4": currentData.dataList.find(e => e.key === "DV4").value,
+                                    "pv5": currentData.dataList.find(e => e.key === "DV5").value,
+                                    "pv6": currentData.dataList.find(e => e.key === "DV6").value,
+                                    "pv7": currentData.dataList.find(e => e.key === "DV7").value,
+                                    "pv8": currentData.dataList.find(e => e.key === "DV8").value,
+                                    "pv9": currentData.dataList.find(e => e.key === "DV9").value,
+                                    "pv10": currentData.dataList.find(e => e.key === "DV10").value,
+                                    "pv11": currentData.dataList.find(e => e.key === "DV11").value,
+                                    "pv12": currentData.dataList.find(e => e.key === "DV12").value,
+                                    "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
+                                    "location_uid": currentData.deviceId
+                                })
+                            }
+                        })
                 });
         });
 });
@@ -225,14 +257,18 @@ routerS.post('/getStationByDevice', (req, res) => {
                     .catch(error => res.status(401).send({msg: 'getDeviceList error:', error}))
                     .finally(() => {
                         try {
-                            stationList.data.forEach((station) => {
+                            stationList.forEach((station) => {
                                 getDeviceList(station.id, access_token)
                                     .then((result) => {
-                                        deviceList = result.data;
+                                        deviceList = result;
                                         let device = deviceList.find(e => e.deviceSn === deviceSn);
                                         if (device) {
-                                            console.log(station.name);
-                                            res.status(200).send(station.name);
+                                            res.status(200).send({
+                                                station: station.name,
+                                                hybrid: station.gridInterconnectionType === "BATTERY_BACKUP",
+                                                name: device.deviceName,
+                                                status: device.deviceStatus
+                                            });
                                         }
                                     })
                                     .catch(e => console.log(e));

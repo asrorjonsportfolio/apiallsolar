@@ -73,6 +73,7 @@ routerH.post('/getRealTimeData', (req, res) => {
     let AC;
     let DC;
     let currentData;
+    let deviceList;
     try {
         getAc(sn)
             .then(async (result) => {
@@ -92,42 +93,52 @@ routerH.post('/getRealTimeData', (req, res) => {
                             })
                             .catch(error => res.status(401).send({msg: 'getCurrentData error:', error}))
                             .finally(() => {
-                                try {
-                                    let overview = currentData.find(e => e.i18nKey === "Overview").paramList;
-                                    let info = currentData.find(e => e.i18nKey === "System Information").paramList;
-                                    let alarm = currentData.find(e => e.i18nKey === "Fault alarm").paramList;
-                                    res.status(200).send({
-                                        "inverter_sn": sn,
-                                        "power": info.find(e => e.paramName === "Rated Power").paramValue,
-                                        "today_energy": overview.find(e => e.paramName === "Today Yield").paramValue,
-                                        "energy_change": "",
-                                        "date": info.find(e => e.paramName === "Current date-time").paramValue,
-                                        "export_energy": overview.find(e => e.paramName === "AC active power").paramValue,
-                                        "import_energy": 0,
-                                        "differ_voltage_ab": AC.find(e => e.name === "A-phase").voltage,
-                                        "differ_voltage_bc": AC.find(e => e.name === "B-phase").voltage,
-                                        "differ_voltage_ac": AC.find(e => e.name === "C-phase").voltage,
-                                        "temperature": overview.find(e => e.paramName === "Internal temperature").paramValue,
-                                        "alarm_code": [alarm.find(e => e.paramName === "Fault code").paramValue,
-                                            alarm.find(e => e.paramName === "Alarm code").paramValue],
-                                        "mppt1": DC.find(e => e.mpptName === "MPPT1").voltage,
-                                        "mppt2": DC.find(e => e.mpptName === "MPPT2").voltage,
-                                        "mppt3": DC.find(e => e.mpptName === "MPPT3").voltage,
-                                        "mppt4": DC.find(e => e.mpptName === "MPPT4").voltage,
-                                        "mppt5": DC.find(e => e.mpptName === "MPPT5").voltage,
-                                        "mppt6": DC.find(e => e.mpptName === "MPPT6").voltage,
-                                        "mppt7": DC.find(e => e.mpptName === "MPPT7").voltage,
-                                        "mppt8": DC.find(e => e.mpptName === "MPPT8").voltage,
-                                        "mppt9": DC.find(e => e.mpptName === "MPPT9").voltage,
-                                        "mppt10": DC.find(e => e.mpptName === "MPPT10").voltage,
-                                        "mppt11": DC.find(e => e.mpptName === "MPPT11").voltage,
-                                        "mppt12": DC.find(e => e.mpptName === "MPPT12").voltage,
-                                        "total_yield_energy": overview.find(e => e.paramName === "Total Yield").paramValue,
+                                getDeviceList()
+                                    .then(result => deviceList = result.result.records)
+                                    .catch(e => console.log(e))
+                                    .finally(() => {
+                                        try {
+                                            let overview = currentData.find(e => e.i18nKey === "Overview").paramList;
+                                            let info = currentData.find(e => e.i18nKey === "System Information").paramList;
+                                            let alarm = currentData.find(e => e.i18nKey === "Fault alarm").paramList;
+                                            res.status(200).send({
+                                                "type": "HOPEWIND",
+                                                "hybrid": false,
+                                                "station_name": deviceList.find(e => e.sn === sn).powerPlantName,
+                                                "inverter_name": deviceList.find(e => e.sn === sn).name,
+                                                "inverter_sn": sn,
+                                                "status": deviceList.find(e => e.sn === sn).deviceStatus,
+                                                "power": info.find(e => e.paramName === "Rated Power").paramValue,
+                                                "today_energy": overview.find(e => e.paramName === "Today Yield").paramValue,
+                                                "energy_change": "",
+                                                "date": info.find(e => e.paramName === "Current date-time").paramValue,
+                                                "export_energy": overview.find(e => e.paramName === "AC active power").paramValue,
+                                                "import_energy": 0,
+                                                "differ_voltage_ab": AC.find(e => e.name === "A-phase").voltage,
+                                                "differ_voltage_bc": AC.find(e => e.name === "B-phase").voltage,
+                                                "differ_voltage_ac": AC.find(e => e.name === "C-phase").voltage,
+                                                "temperature": overview.find(e => e.paramName === "Internal temperature").paramValue,
+                                                "alarm_code": [alarm.find(e => e.paramName === "Fault code").paramValue,
+                                                    alarm.find(e => e.paramName === "Alarm code").paramValue],
+                                                "mppt1": DC.find(e => e.mpptName === "MPPT1").voltage,
+                                                "mppt2": DC.find(e => e.mpptName === "MPPT2").voltage,
+                                                "mppt3": DC.find(e => e.mpptName === "MPPT3").voltage,
+                                                "mppt4": DC.find(e => e.mpptName === "MPPT4").voltage,
+                                                "mppt5": DC.find(e => e.mpptName === "MPPT5").voltage,
+                                                "mppt6": DC.find(e => e.mpptName === "MPPT6").voltage,
+                                                "mppt7": DC.find(e => e.mpptName === "MPPT7").voltage,
+                                                "mppt8": DC.find(e => e.mpptName === "MPPT8").voltage,
+                                                "mppt9": DC.find(e => e.mpptName === "MPPT9").voltage,
+                                                "mppt10": DC.find(e => e.mpptName === "MPPT10").voltage,
+                                                "mppt11": DC.find(e => e.mpptName === "MPPT11").voltage,
+                                                "mppt12": DC.find(e => e.mpptName === "MPPT12").voltage,
+                                                "total_yield_energy": overview.find(e => e.paramName === "Total Yield").paramValue,
+                                            })
+                                        } catch (e) {
+                                            console.log(e);
+                                            res.status(401).send({msg: "deviceSn might be wrong", e});
+                                        }
                                     })
-                                } catch (e) {
-                                    console.log(e);
-                                    res.status(401).send({msg: "deviceSn might be wrong", e});
-                                }
                             })
                     });
             });
