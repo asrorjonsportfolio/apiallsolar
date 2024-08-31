@@ -163,6 +163,7 @@ routerS.post('/getRealTimeData', (req, res) => {
                                     "type": type[1],
                                     "hybrid": hybrid,
                                     "station_name": stationName,
+                                    "station_id": stationId,
                                     "inverter_name": deviceName,
                                     "inverter_sn": deviceSn,
                                     "status": status,
