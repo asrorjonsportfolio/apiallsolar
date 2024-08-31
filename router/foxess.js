@@ -14,5 +14,60 @@ routerF.post('/getCurrentData', (req, res) => {
         .then(response => res.status(200).send({data: response}))
         .catch(error => res.status(401).send({msg: 'foxess getstationlistmongo error', error}));
 });
+routerF.post('/getRealTimeData', (req, res) => {
+    const {deviceSn} = req.body;
+    console.log(deviceSn)
+    let currentData;
+    let deviceList;
+    getCurrentData(deviceSn)
+        .then(result => {
+            currentData = result[0];
+            console.log(result[0])
+        })
+        .catch(error => res.status(401).send({msg: 'getcurrentdata error:', error}))
+        .finally(() => {
+            getDeviceList()
+                .then(result => {
+                    deviceList = result.data;
+                })
+                .catch(e => console.log(e))
+                .finally(() => {
+                    res.status(200).send({
+                        "type": "FOXESS",
+                        "hybrid": deviceList.find(e => e.deviceSN === deviceSn).hasBattery,
+                        "station_name": deviceList.find(e => e.deviceSN === deviceSn).stationName,
+                        "station_id": deviceList.find(e => e.deviceSN === deviceSn).stationID,
+                        "inverter_name": `${deviceList.find(e => e.deviceSN === deviceSn).stationName} FOXESS (25)`,
+                        "inverter_sn": deviceSn,
+                        "status": deviceList.find(e => e.deviceSN === deviceSn).status,
+                        "power": "25",
+                        "today_energy": currentData.datas.find(e => e.variable === "todayYield").value,
+                        "energy_change": "",
+                        "date": currentData.time,
+                        "export_energy": currentData.datas.find(e => e.variable === "generationPower").value,
+                        "import_energy": currentData.datas.find(e => e.variable === "gridConsumptionPower").value,
+                        "differ_voltage_ab": currentData.datas.find(e => e.variable === "RVolt").value,
+                        "differ_voltage_bc": currentData.datas.find(e => e.variable === "SVolt").value,
+                        "differ_voltage_ac": currentData.datas.find(e => e.variable === "TVolt").value,
+                        "temperature": currentData.datas.find(e => e.variable === "invTemperation").value,
+                        "alarm_code": currentData.datas.find(e => e.variable === "currentFault").value,
+                        "pv1": currentData.datas.find(e => e.variable === "pv1Volt").value,
+                        "pv2": currentData.datas.find(e => e.variable === "pv2Volt").value,
+                        "pv3": currentData.datas.find(e => e.variable === "pv3Volt").value,
+                        "pv4": currentData.datas.find(e => e.variable === "pv4Volt").value,
+                        "pv5": "",
+                        "pv6": "",
+                        "pv7": "",
+                        "pv8": "",
+                        "pv9": "",
+                        "pv10": "",
+                        "pv11": "",
+                        "pv12": "",
+                        "total_yield_energy": currentData.datas.find(e => e.variable === "generation").value,
+                        "location_uid": ""
+                    })
+                })
+        });
+});
 
 module.exports = routerF;

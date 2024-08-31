@@ -191,7 +191,7 @@ routerS.post('/getRealTimeData', (req, res) => {
                                     "pv11": currentData.dataList.find(e => e.key === "DV11").value,
                                     "pv12": currentData.dataList.find(e => e.key === "DV12").value,
                                     "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
-                                    "location_uid": currentData.deviceId
+                                    "location_uid": ""
                                 })
                             }
                         })

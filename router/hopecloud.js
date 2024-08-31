@@ -119,10 +119,7 @@ routerH.post('/getRealTimeData', (req, res) => {
                                                 "differ_voltage_bc": AC.find(e => e.name === "B-phase").voltage,
                                                 "differ_voltage_ac": AC.find(e => e.name === "C-phase").voltage,
                                                 "temperature": overview.find(e => e.paramName === "Internal temperature").paramValue,
-                                                "alarm_code": {
-                                                    fault_code: alarm.find(e => e.paramName === "Fault code").paramValue,
-                                                    alarm_code: alarm.find(e => e.paramName === "Alarm code").paramValue
-                                                },
+                                                "alarm_code": alarm.find(e => e.paramName === "Alarm code").paramValue,
                                                 "pv1": DC.find(e => e.mpptName === "MPPT1").voltage,
                                                 "pv2": DC.find(e => e.mpptName === "MPPT2").voltage,
                                                 "pv3": DC.find(e => e.mpptName === "MPPT3").voltage,
@@ -136,6 +133,7 @@ routerH.post('/getRealTimeData', (req, res) => {
                                                 "pv11": DC.find(e => e.mpptName === "MPPT11").voltage,
                                                 "pv12": DC.find(e => e.mpptName === "MPPT12").voltage,
                                                 "total_yield_energy": overview.find(e => e.paramName === "Total Yield").paramValue,
+                                                "location_uid": ""
                                             })
                                         } catch (e) {
                                             console.log(e);
