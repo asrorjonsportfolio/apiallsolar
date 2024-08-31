@@ -212,7 +212,7 @@ routerS.post('/getRealTimeData', (req, res) => {
                                     "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2").value,
                                     "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3").value,
                                     "temperature": currentData.dataList.find(e => e.key === "AC_T").value,
-                                    "alarm_code": currentData.dataList.find(e => e.key === "Fault_Code1").value,
+                                    "alarm_code": "",
                                     "pv1": currentData.dataList.find(e => e.key === "DV1").value,
                                     "pv2": currentData.dataList.find(e => e.key === "DV2").value,
                                     "pv3": currentData.dataList.find(e => e.key === "DV3").value,
