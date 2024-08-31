@@ -133,6 +133,7 @@ routerS.post('/getRealTimeData', (req, res) => {
                 .finally(() => {
                     let stationName = "";
                     let deviceName = "";
+                    let stationId = 0;
                     let hybrid = false;
                     let status = 1;
                     fetch("http://localhost:8080/solarman/getStationByDevice", {
@@ -150,6 +151,7 @@ routerS.post('/getRealTimeData', (req, res) => {
                             hybrid = result.hybrid;
                             deviceName = result.name;
                             status = result.status;
+                            stationId = result.stationId;
                         })
                         .catch(e => console.log(e))
                         .finally(() => {
@@ -267,7 +269,8 @@ routerS.post('/getStationByDevice', (req, res) => {
                                                 station: station.name,
                                                 hybrid: station.gridInterconnectionType === "BATTERY_BACKUP",
                                                 name: device.deviceName,
-                                                status: device.deviceStatus
+                                                status: device.deviceStatus,
+                                                stationId: station.id
                                             });
                                         }
                                     })
