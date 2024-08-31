@@ -145,7 +145,7 @@ routerH.post('/getRealTimeData', (req, res) => {
             });
     } catch (e) {
         console.log(e);
-        res.status(401).send({msg: "deviceSn might be wrong", e});
+        res.status(401).send({msg: "deviceSn might be wrong", error: e});
     }
 });
 routerH.post('/getDeviceData', (req, res) => {
