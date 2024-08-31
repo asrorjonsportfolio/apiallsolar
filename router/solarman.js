@@ -193,6 +193,41 @@ routerS.post('/getRealTimeData', (req, res) => {
                                     "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
                                     "location_uid": ""
                                 })
+                            } else {
+                                res.status(200).send({
+                                    "type": type[1],
+                                    "hybrid": hybrid,
+                                    "station_name": stationName,
+                                    "station_id": stationId,
+                                    "inverter_name": deviceName,
+                                    "inverter_sn": deviceSn,
+                                    "status": status,
+                                    "power": currentData.dataList.find(e => e.key === "Pr1").value,
+                                    "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
+                                    "energy_change": "",
+                                    "date": currentData.collectionTime,
+                                    "export_energy": parseInt(currentData.dataList.find(e => e.key === "INV_O_P_T").value) / 1000,
+                                    "import_energy": currentData.dataList.find(e => e.key === "CT_T_E").value,
+                                    "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1").value,
+                                    "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2").value,
+                                    "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3").value,
+                                    "temperature": currentData.dataList.find(e => e.key === "AC_T").value,
+                                    "alarm_code": currentData.dataList.find(e => e.key === "Fault_Code1").value,
+                                    "pv1": currentData.dataList.find(e => e.key === "DV1").value,
+                                    "pv2": currentData.dataList.find(e => e.key === "DV2").value,
+                                    "pv3": currentData.dataList.find(e => e.key === "DV3").value,
+                                    "pv4": currentData.dataList.find(e => e.key === "DV4").value,
+                                    "pv5": currentData.dataList.find(e => e.key === "DV5").value,
+                                    "pv6": currentData.dataList.find(e => e.key === "DV6").value,
+                                    "pv7": currentData.dataList.find(e => e.key === "DV7").value,
+                                    "pv8": currentData.dataList.find(e => e.key === "DV8").value,
+                                    "pv9": currentData.dataList.find(e => e.key === "DV9").value,
+                                    "pv10": currentData.dataList.find(e => e.key === "DV10").value,
+                                    "pv11": currentData.dataList.find(e => e.key === "DV11").value,
+                                    "pv12": currentData.dataList.find(e => e.key === "DV12").value,
+                                    "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
+                                    "location_uid": ""
+                                })
                             }
                         })
                 });

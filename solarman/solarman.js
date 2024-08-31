@@ -17,7 +17,6 @@ module.exports = {
         return await response.json();
     },
     getStationList: async function (access_token) {
-        let token = process.env.ACCESS_TOKEN;
         const response = await fetch("https://globalhome.solarmanpv.com/maintain-s/operating/station/search?order.direction=DESC&order.property=id&page=1&size=20", {
             "headers": {
                 "accept": "application/json, text/plain, */*",
@@ -43,7 +42,6 @@ module.exports = {
         return await response.json();
     },
     getDeviceList: async function (stationId, access_token) {
-        let token = process.env.ACCESS_TOKEN;
         const response = await fetch(`https://globalhome.solarmanpv.com/maintain-s/fast/device/${stationId}/device-list?deviceType=INVERTER`, {
             "headers": {
                 "accept": "application/json, text/plain, */*",
@@ -143,5 +141,19 @@ module.exports = {
             "method": "GET"
         });
         return await response.json();
+    },
+    getAlarmData: async function (deviceSn, startTime, access_token) {
+        let response = await fetch("https://api.solarmanpv.com/device/v1.0/alertList", {
+            method: "POST",
+            headers: {
+                'Authorization': `Bearer ${access_token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "deviceSn": `${deviceSn}`,
+                "startTime": 574132075,
+                "endTime": Date.now()
+            })
+        })
     }
 }
