@@ -114,138 +114,86 @@ routerS.post('/getHistoryDataHybrid', (req, res) => {
         })
 });
 
-routerS.post('/getRealTimeData', (req, res) => {
+routerS.post('/getRealTimeData', async (req, res) => {
     const {deviceSn} = req.body;
-    console.log(deviceSn)
+    console.log(deviceSn);
     let access_token = "";
+
     try {
-        login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN)
-            .then((result) => {
-                access_token = result.access_token;
-            })
-            .catch(error => res.status(401).send(error))
-            .finally(() => {
-                let currentData;
-                try {
-                    getCurrentData(deviceSn, access_token)
-                        .then(async (result) => {
-                            currentData = result;
-                        })
-                        .catch(error => console.log(error))
-                        .finally(() => {
-                            let stationName = "";
-                            let deviceName = "";
-                            let stationId = 0;
-                            let hybrid = false;
-                            let status = 1;
-                            try {
-                                fetch("http://localhost:8080/solarman/getStationByDevice", {
-                                    method: "POST",
-                                    headers: {
-                                        "Content-Type": "application/json"
-                                    },
-                                    body: JSON.stringify({
-                                        deviceSn
-                                    })
-                                })
-                                    .then(async result => {
-                                        result = await result.json();
-                                        stationName = result.station;
-                                        hybrid = result.hybrid;
-                                        deviceName = result.name;
-                                        status = result.status;
-                                        stationId = result.stationId;
-                                    })
-                                    .catch(e => console.log(e))
-                                    .finally(() => {
-                                        const regex = /Inverter[-\d]*\s+(\w+)\s*\(\d+\)/;
-                                        const type = deviceName.match(regex);
-                                        console.log(type)
-                                        if (hybrid === false) {
-                                            res.status(200).send({
-                                                "type": type[1],
-                                                "hybrid": hybrid,
-                                                "station_name": stationName,
-                                                "station_id": stationId,
-                                                "inverter_name": deviceName,
-                                                "inverter_sn": deviceSn,
-                                                "status": status,
-                                                "power": currentData.dataList.find(e => e.key === "Pr1").value,
-                                                "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
-                                                "energy_change": "",
-                                                "date": currentData.collectionTime,
-                                                "export_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
-                                                "import_energy": currentData.dataList.find(e => e.key === "Etdy_use1").value,
-                                                "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1").value,
-                                                "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2").value,
-                                                "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3").value,
-                                                "temperature": currentData.dataList.find(e => e.key === "T_boost1").value,
-                                                "alarm_code": currentData.dataList.find(e => e.key === "Fault_Code1").value,
-                                                "pv1": currentData.dataList.find(e => e.key === "DV1").value,
-                                                "pv2": currentData.dataList.find(e => e.key === "DV2").value,
-                                                "pv3": currentData.dataList.find(e => e.key === "DV3").value,
-                                                "pv4": currentData.dataList.find(e => e.key === "DV4").value,
-                                                "pv5": currentData.dataList.find(e => e.key === "DV5").value,
-                                                "pv6": currentData.dataList.find(e => e.key === "DV6").value,
-                                                "pv7": currentData.dataList.find(e => e.key === "DV7").value,
-                                                "pv8": currentData.dataList.find(e => e.key === "DV8").value,
-                                                "pv9": currentData.dataList.find(e => e.key === "DV9").value,
-                                                "pv10": currentData.dataList.find(e => e.key === "DV10").value,
-                                                "pv11": currentData.dataList.find(e => e.key === "DV11").value,
-                                                "pv12": currentData.dataList.find(e => e.key === "DV12").value,
-                                                "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
-                                                "location_uid": ""
-                                            })
-                                        } else {
-                                            res.status(200).send({
-                                                "type": type[1],
-                                                "hybrid": hybrid,
-                                                "station_name": stationName,
-                                                "station_id": stationId,
-                                                "inverter_name": deviceName,
-                                                "inverter_sn": deviceSn,
-                                                "status": status,
-                                                "power": currentData.dataList.find(e => e.key === "Pr1").value,
-                                                "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1").value,
-                                                "energy_change": "",
-                                                "date": currentData.collectionTime,
-                                                "export_energy": parseInt(currentData.dataList.find(e => e.key === "INV_O_P_T").value) / 1000,
-                                                "import_energy": currentData.dataList.find(e => e.key === "CT_T_E").value,
-                                                "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1").value,
-                                                "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2").value,
-                                                "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3").value,
-                                                "temperature": currentData.dataList.find(e => e.key === "AC_T").value,
-                                                "alarm_code": "",
-                                                "pv1": currentData.dataList.find(e => e.key === "DV1").value,
-                                                "pv2": currentData.dataList.find(e => e.key === "DV2").value,
-                                                "pv3": currentData.dataList.find(e => e.key === "DV3").value,
-                                                "pv4": currentData.dataList.find(e => e.key === "DV4").value,
-                                                "pv5": "",
-                                                "pv6": "",
-                                                "pv7": "",
-                                                "pv8": "",
-                                                "pv9": "",
-                                                "pv10": "",
-                                                "pv11": "",
-                                                "pv12": "",
-                                                "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0").value,
-                                                "location_uid": ""
-                                            })
-                                        }
-                                    })
-                            } catch (e) {
-                                console.log(e);
-                                res.status(401).send({msg: 'getstationbydevice error:', error: e})
-                            }
-                        });
-                } catch (e) {
-                    console.log(e);
-                    res.status(401).send({msg: 'getcurrentdata error:', error: e})
-                }
+        // Get access token
+        const loginResult = await login(process.env.USERNAME_SOLARMAN, process.env.PASSWORD_SOLARMAN, process.env.APP_SECRET_SOLARMAN);
+        access_token = loginResult.access_token;
+
+        // Get current data
+        const currentData = await getCurrentData(deviceSn, access_token);
+        console.log(currentData);
+        if (currentData.success === false) {
+            res.status(401).send({msg: currentData.msg});
+        } else {
+            // Fetch station data by device
+            const stationResponse = await fetch("http://localhost:8080/solarman/getStationByDevice", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({deviceSn})
             });
-    } catch (e) {
-        console.log(e);
-        res.status(401).send({msg: "deviceSn might be wrong", error: e});
+
+            const stationData = await stationResponse.json();
+
+            // Extract data from the response
+            const {station, hybrid, name: deviceName, status, stationId} = stationData;
+            const regex = /Inverter[-\d]*\s+(\w+)\s*\(\d+\)/;
+            const typeMatch = deviceName.match(regex);
+            const type = typeMatch ? typeMatch[1] : "Unknown";
+
+            // Prepare response data based on hybrid status
+            const responseData = {
+                "type": type,
+                "hybrid": hybrid,
+                "station_name": station,
+                "station_id": stationId,
+                "inverter_name": deviceName,
+                "inverter_sn": deviceSn,
+                "status": status,
+                "power": currentData.dataList.find(e => e.key === "Pr1")?.value || 0,
+                "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1")?.value || 0,
+                "energy_change": "",
+                "date": currentData.collectionTime,
+                "export_energy": hybrid === false ?
+                    currentData.dataList.find(e => e.key === "Etdy_ge1")?.value || 0 :
+                    parseInt(currentData.dataList.find(e => e.key === "INV_O_P_T")?.value || 0) / 1000,
+                "import_energy": hybrid === false ?
+                    currentData.dataList.find(e => e.key === "Etdy_use1")?.value || 0 :
+                    currentData.dataList.find(e => e.key === "CT_T_E")?.value || 0,
+                "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1")?.value || 0,
+                "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2")?.value || 0,
+                "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3")?.value || 0,
+                "temperature": hybrid === false ?
+                    currentData.dataList.find(e => e.key === "T_boost1")?.value || 0 :
+                    currentData.dataList.find(e => e.key === "AC_T")?.value || 0,
+                "alarm_code": hybrid === false ?
+                    currentData.dataList.find(e => e.key === "Fault_Code1")?.value || "" : "",
+                "pv1": currentData.dataList.find(e => e.key === "DV1")?.value || 0,
+                "pv2": currentData.dataList.find(e => e.key === "DV2")?.value || 0,
+                "pv3": currentData.dataList.find(e => e.key === "DV3")?.value || 0,
+                "pv4": currentData.dataList.find(e => e.key === "DV4")?.value || 0,
+                "pv5": currentData.dataList.find(e => e.key === "DV5")?.value || 0,
+                "pv6": currentData.dataList.find(e => e.key === "DV6")?.value || 0,
+                "pv7": currentData.dataList.find(e => e.key === "DV7")?.value || 0,
+                "pv8": currentData.dataList.find(e => e.key === "DV8")?.value || 0,
+                "pv9": currentData.dataList.find(e => e.key === "DV9")?.value || 0,
+                "pv10": currentData.dataList.find(e => e.key === "DV10")?.value || 0,
+                "pv11": currentData.dataList.find(e => e.key === "DV11")?.value || 0,
+                "pv12": currentData.dataList.find(e => e.key === "DV12")?.value || 0,
+                "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0")?.value || 0,
+                "location_uid": ""
+            };
+
+            // Send the response
+            res.status(200).send(responseData);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({msg: 'An error occurred while fetching data', error});
     }
 });
 

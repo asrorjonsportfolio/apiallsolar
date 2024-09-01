@@ -68,84 +68,75 @@ routerH.post('/getPowerCapacityByUserId', (req, res) => {
         .then(response => res.status(200).send({data: response.result}))
         .catch(error => console.log('getpowercapacity error', error));
 });
-routerH.post('/getRealTimeData', (req, res) => {
+routerH.post('/getRealTimeData', async (req, res) => {
     const {sn} = req.body;
-    let AC;
-    let DC;
-    let currentData;
-    let deviceList;
+    let AC, DC, currentData, deviceList;
+
     try {
-        getAc(sn)
-            .then(async (result) => {
-                AC = result.result;
-            })
-            .catch(error => res.status(401).send({msg: 'getAC error:', error}))
-            .finally(() => {
-                getDc(sn)
-                    .then(async (result) => {
-                        DC = result.result;
-                    })
-                    .catch(error => res.status(401).send({msg: 'getDC error:', error}))
-                    .finally(() => {
-                        getCurrentData(sn)
-                            .then(async (result) => {
-                                currentData = result.result;
-                            })
-                            .catch(error => res.status(401).send({msg: 'getCurrentData error:', error}))
-                            .finally(() => {
-                                getDeviceList()
-                                    .then(result => deviceList = result.result.records)
-                                    .catch(e => console.log(e))
-                                    .finally(() => {
-                                        try {
-                                            let overview = currentData.find(e => e.i18nKey === "Overview").paramList;
-                                            let info = currentData.find(e => e.i18nKey === "System Information").paramList;
-                                            let alarm = currentData.find(e => e.i18nKey === "Fault alarm").paramList;
-                                            res.status(200).send({
-                                                "type": "HOPEWIND",
-                                                "hybrid": false,
-                                                "station_name": deviceList.find(e => e.sn === sn).powerPlantName,
-                                                "station_id": deviceList.find(e => e.sn === sn).powerPlantId,
-                                                "inverter_name": deviceList.find(e => e.sn === sn).name,
-                                                "inverter_sn": sn,
-                                                "status": deviceList.find(e => e.sn === sn).deviceStatus,
-                                                "power": info.find(e => e.paramName === "Rated Power").paramValue,
-                                                "today_energy": overview.find(e => e.paramName === "Today Yield").paramValue,
-                                                "energy_change": "",
-                                                "date": info.find(e => e.paramName === "Current date-time").paramValue,
-                                                "export_energy": overview.find(e => e.paramName === "AC active power").paramValue,
-                                                "import_energy": 0,
-                                                "differ_voltage_ab": AC.find(e => e.name === "A-phase").voltage,
-                                                "differ_voltage_bc": AC.find(e => e.name === "B-phase").voltage,
-                                                "differ_voltage_ac": AC.find(e => e.name === "C-phase").voltage,
-                                                "temperature": overview.find(e => e.paramName === "Internal temperature").paramValue,
-                                                "alarm_code": alarm.find(e => e.paramName === "Alarm code").paramValue,
-                                                "pv1": DC.find(e => e.mpptName === "MPPT1").voltage,
-                                                "pv2": DC.find(e => e.mpptName === "MPPT2").voltage,
-                                                "pv3": DC.find(e => e.mpptName === "MPPT3").voltage,
-                                                "pv4": DC.find(e => e.mpptName === "MPPT4").voltage,
-                                                "pv5": DC.find(e => e.mpptName === "MPPT5").voltage,
-                                                "pv6": DC.find(e => e.mpptName === "MPPT6").voltage,
-                                                "pv7": DC.find(e => e.mpptName === "MPPT7").voltage,
-                                                "pv8": DC.find(e => e.mpptName === "MPPT8").voltage,
-                                                "pv9": DC.find(e => e.mpptName === "MPPT9").voltage,
-                                                "pv10": DC.find(e => e.mpptName === "MPPT10").voltage,
-                                                "pv11": DC.find(e => e.mpptName === "MPPT11").voltage,
-                                                "pv12": DC.find(e => e.mpptName === "MPPT12").voltage,
-                                                "total_yield_energy": overview.find(e => e.paramName === "Total Yield").paramValue,
-                                                "location_uid": ""
-                                            })
-                                        } catch (e) {
-                                            console.log(e);
-                                            res.status(401).send({msg: "deviceSn might be wrong", e});
-                                        }
-                                    })
-                            })
-                    });
+        // Fetch current data
+        const currentDataResult = await getCurrentData(sn);
+        if (currentDataResult.result.length === 0) {
+            res.status(401).send({msg: "deviceSn might be wrong"});
+        } else {
+            currentData = currentDataResult.result;
+
+            // Fetch AC data
+            const acResult = await getAc(sn);
+            AC = acResult.result;
+
+            // Fetch DC data
+            const dcResult = await getDc(sn);
+            DC = dcResult.result;
+
+            // Fetch device list
+            const deviceListResult = await getDeviceList();
+            deviceList = deviceListResult.result.records;
+
+            // Extract relevant data
+            let overview = currentData.find(e => e.i18nKey === "Overview").paramList;
+            let info = currentData.find(e => e.i18nKey === "System Information").paramList;
+            let alarm = currentData.find(e => e.i18nKey === "Fault alarm").paramList;
+            const deviceInfo = deviceList.find(e => e.sn === sn);
+
+            // Send response with data
+            res.status(200).send({
+                "type": "HOPEWIND",
+                "hybrid": false,
+                "station_name": deviceInfo?.powerPlantName || "",
+                "station_id": deviceInfo?.powerPlantId || "",
+                "inverter_name": deviceInfo?.name || "",
+                "inverter_sn": sn,
+                "status": deviceInfo?.deviceStatus || "",
+                "power": info.find(e => e.paramName === "Rated Power")?.paramValue || 0,
+                "today_energy": overview.find(e => e.paramName === "Today Yield")?.paramValue || 0,
+                "energy_change": "",
+                "date": info.find(e => e.paramName === "Current date-time")?.paramValue || "",
+                "export_energy": overview.find(e => e.paramName === "AC active power")?.paramValue || 0,
+                "import_energy": 0,
+                "differ_voltage_ab": AC.find(e => e.name === "A-phase")?.voltage || 0,
+                "differ_voltage_bc": AC.find(e => e.name === "B-phase")?.voltage || 0,
+                "differ_voltage_ac": AC.find(e => e.name === "C-phase")?.voltage || 0,
+                "temperature": overview.find(e => e.paramName === "Internal temperature")?.paramValue || 0,
+                "alarm_code": alarm.find(e => e.paramName === "Alarm code")?.paramValue || "",
+                "pv1": DC.find(e => e.mpptName === "MPPT1")?.voltage || 0,
+                "pv2": DC.find(e => e.mpptName === "MPPT2")?.voltage || 0,
+                "pv3": DC.find(e => e.mpptName === "MPPT3")?.voltage || 0,
+                "pv4": DC.find(e => e.mpptName === "MPPT4")?.voltage || 0,
+                "pv5": DC.find(e => e.mpptName === "MPPT5")?.voltage || 0,
+                "pv6": DC.find(e => e.mpptName === "MPPT6")?.voltage || 0,
+                "pv7": DC.find(e => e.mpptName === "MPPT7")?.voltage || 0,
+                "pv8": DC.find(e => e.mpptName === "MPPT8")?.voltage || 0,
+                "pv9": DC.find(e => e.mpptName === "MPPT9")?.voltage || 0,
+                "pv10": DC.find(e => e.mpptName === "MPPT10")?.voltage || 0,
+                "pv11": DC.find(e => e.mpptName === "MPPT11")?.voltage || 0,
+                "pv12": DC.find(e => e.mpptName === "MPPT12")?.voltage || 0,
+                "total_yield_energy": overview.find(e => e.paramName === "Total Yield")?.paramValue || 0,
+                "location_uid": ""
             });
-    } catch (e) {
-        console.log(e);
-        res.status(401).send({msg: "deviceSn might be wrong", error: e});
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).send({msg: 'An error occurred while fetching data', error: error});
     }
 });
 routerH.post('/getDeviceData', (req, res) => {
