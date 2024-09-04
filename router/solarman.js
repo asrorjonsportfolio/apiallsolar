@@ -154,13 +154,13 @@ routerS.post('/getRealTimeData', async (req, res) => {
                 "inverter_name": deviceName,
                 "inverter_sn": deviceSn,
                 "status": status,
-                "power": currentData.dataList.find(e => e.key === "Pr1")?.value || 0,
+                "power": parseInt(currentData.dataList.find(e => e.key === "Pr1")?.value) / 1000 || 0,
                 "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1")?.value || 0,
                 "energy_change": "",
                 "date": currentData.collectionTime,
                 "export_energy": hybrid === false ?
-                    currentData.dataList.find(e => e.key === "Etdy_ge1")?.value || 0 :
-                    parseInt(currentData.dataList.find(e => e.key === "INV_O_P_T")?.value || 0) / 1000,
+                    parseInt(currentData.dataList.find(e => e.key === "APo_t1")?.value) / 1000 || 0 :
+                    parseInt(currentData.dataList.find(e => e.key === "INV_O_P_T")?.value) / 1000 || 0,
                 "import_energy": hybrid === false ?
                     currentData.dataList.find(e => e.key === "Etdy_use1")?.value || 0 :
                     currentData.dataList.find(e => e.key === "CT_T_E")?.value || 0,
