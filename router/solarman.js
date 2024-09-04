@@ -149,43 +149,42 @@ routerS.post('/getRealTimeData', async (req, res) => {
             const responseData = {
                 "type": type,
                 "hybrid": hybrid,
-                "station_name": station,
-                "station_id": stationId,
-                "inverter_name": deviceName,
-                "inverter_sn": deviceSn,
-                "status": status,
-                "power": parseInt(currentData.dataList.find(e => e.key === "Pr1")?.value) / 1000 || 0,
-                "today_energy": currentData.dataList.find(e => e.key === "Etdy_ge1")?.value || 0,
+                "station_name": `${station}`,
+                "station_id": `${stationId}`,
+                "inverter_name": `${deviceName}`,
+                "inverter_sn": `${deviceSn}`,
+                "status": `${status}`,
+                "power": `${parseInt(currentData.dataList.find(e => e.key === "Pr1")?.value) / 1000}` || "0",
+                "today_energy": `${currentData.dataList.find(e => e.key === "Etdy_ge1")?.value}` || "0",
                 "energy_change": "",
-                "date": currentData.collectionTime,
+                "date": `${currentData.collectionTime}`,
                 "export_energy": hybrid === false ?
-                    parseInt(currentData.dataList.find(e => e.key === "APo_t1")?.value) / 1000 || 0 :
-                    parseInt(currentData.dataList.find(e => e.key === "INV_O_P_T")?.value) / 1000 || 0,
+                    `${parseInt(currentData.dataList.find(e => e.key === "APo_t1")?.value) / 1000}` || "0" :
+                    `${parseInt(currentData.dataList.find(e => e.key === "INV_O_P_T")?.value) / 1000}` || "0",
                 "import_energy": hybrid === false ?
-                    currentData.dataList.find(e => e.key === "Etdy_use1")?.value || 0 :
-                    currentData.dataList.find(e => e.key === "CT_T_E")?.value || 0,
-                "differ_voltage_ab": currentData.dataList.find(e => e.key === "AV1")?.value || 0,
-                "differ_voltage_bc": currentData.dataList.find(e => e.key === "AV2")?.value || 0,
-                "differ_voltage_ac": currentData.dataList.find(e => e.key === "AV3")?.value || 0,
+                    `${currentData.dataList.find(e => e.key === "Etdy_use1")?.value}` || "0" :
+                    `${currentData.dataList.find(e => e.key === "CT_T_E")?.value}` || "0",
+                "differ_voltage_ab": `${currentData.dataList.find(e => e.key === "AV1")?.value}` || "0",
+                "differ_voltage_bc": `${currentData.dataList.find(e => e.key === "AV2")?.value}` || "0",
+                "differ_voltage_ac": `${currentData.dataList.find(e => e.key === "AV3")?.value}` || "0",
                 "temperature": hybrid === false ?
-                    currentData.dataList.find(e => e.key === "T_boost1")?.value || 0 :
-                    currentData.dataList.find(e => e.key === "AC_T")?.value || 0,
+                    `${currentData.dataList.find(e => e.key === "T_boost1")?.value}` || "0" :
+                    `${currentData.dataList.find(e => e.key === "AC_T")?.value}` || "0",
                 "alarm_code": hybrid === false ?
-                    currentData.dataList.find(e => e.key === "Fault_Code1")?.value || "" : "",
-                "pv1": currentData.dataList.find(e => e.key === "DV1")?.value || 0,
-                "pv2": currentData.dataList.find(e => e.key === "DV2")?.value || 0,
-                "pv3": currentData.dataList.find(e => e.key === "DV3")?.value || 0,
-                "pv4": currentData.dataList.find(e => e.key === "DV4")?.value || 0,
-                "pv5": currentData.dataList.find(e => e.key === "DV5")?.value || 0,
-                "pv6": currentData.dataList.find(e => e.key === "DV6")?.value || 0,
-                "pv7": currentData.dataList.find(e => e.key === "DV7")?.value || 0,
-                "pv8": currentData.dataList.find(e => e.key === "DV8")?.value || 0,
-                "pv9": currentData.dataList.find(e => e.key === "DV9")?.value || 0,
-                "pv10": currentData.dataList.find(e => e.key === "DV10")?.value || 0,
-                "pv11": currentData.dataList.find(e => e.key === "DV11")?.value || 0,
-                "pv12": currentData.dataList.find(e => e.key === "DV12")?.value || 0,
-                "total_yield_energy": currentData.dataList.find(e => e.key === "Et_ge0")?.value || 0,
-                "location_uid": ""
+                    `${currentData.dataList.find(e => e.key === "Fault_Code1")?.value}` || "" : "",
+                "pv1": `${currentData.dataList.find(e => e.key === "DV1")?.value}` || "0",
+                "pv2": `${currentData.dataList.find(e => e.key === "DV2")?.value}` || "0",
+                "pv3": `${currentData.dataList.find(e => e.key === "DV3")?.value}` || "0",
+                "pv4": `${currentData.dataList.find(e => e.key === "DV4")?.value}` || "0",
+                "pv5": `${currentData.dataList.find(e => e.key === "DV5")?.value}` || "0",
+                "pv6": `${currentData.dataList.find(e => e.key === "DV6")?.value}` || "0",
+                "pv7": `${currentData.dataList.find(e => e.key === "DV7")?.value}` || "0",
+                "pv8": `${currentData.dataList.find(e => e.key === "DV8")?.value}` || "0",
+                "pv9": `${currentData.dataList.find(e => e.key === "DV9")?.value}` || "0",
+                "pv10": `${currentData.dataList.find(e => e.key === "DV10")?.value}` || "0",
+                "pv11": `${currentData.dataList.find(e => e.key === "DV11")?.value}` || "0",
+                "pv12": `${currentData.dataList.find(e => e.key === "DV12")?.value}` || "0",
+                "total_yield_energy": `${currentData.dataList.find(e => e.key === "Et_ge0")?.value}` || "0",
             };
 
             // Send the response
