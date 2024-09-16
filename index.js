@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const routerS = require('./router/solarman');
 const routerH = require('./router/hopecloud');
 const routerF = require("./router/foxess");
+const routerU = require("./router/ung");
 const app = express();
 const port = 8080;
 
@@ -23,6 +24,7 @@ app.use(cors({origin: "http://localhost:3000"}));
 app.use("/solarman", bodyParser.json(), routerS);
 app.use("/hopecloud", bodyParser.json(), routerH);
 app.use("/foxess", bodyParser.json(), routerF);
+app.use("/ung", bodyParser.json(), routerU);
 app.listen(port, () => {
     console.log(`express server is working successfully ${port}`)
 })
