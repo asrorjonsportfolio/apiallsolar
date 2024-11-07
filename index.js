@@ -20,7 +20,7 @@ app.use(
 //     allowedHeaders: ['Content-Type', 'Authorization'] // Allow specific headers
 // }));
 // server.js
-app.use(cors({origin: "http://localhost:3000"}));
+app.use(cors());
 app.use("/solarman", bodyParser.json(), routerS);
 app.use("/hopecloud", bodyParser.json(), routerH);
 app.use("/foxess", bodyParser.json(), routerF);
