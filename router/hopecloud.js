@@ -109,7 +109,7 @@ routerH.post('/getRealTimeData', async (req, res) => {
                 "status": `${deviceInfo?.deviceStatus}` || null,
                 "power": `${info.find(e => e.paramName === "Rated Power")?.paramValue.slice(0, -2)}` || null,
                 "today_energy": `${overview.find(e => e.paramName === "Today Yield")?.paramValue.slice(0, -3)}` || null,
-                "date": `${info.find(e => e.paramName === "Current date-time")?.paramValue}` || null,
+                "date": `${Math.floor(new Date(info.find(e => e.paramName === "Current date-time")?.paramValue).getTime() / 1000)}` || null,
                 "export_energy": `${overview.find(e => e.paramName === "AC active power")?.paramValue.slice(0, -2)}` || null,
                 "import_energy": null,
                 "differ_voltage_ab": `${AC.find(e => e.name === "A-phase")?.voltage}` || null,
