@@ -49,7 +49,7 @@ routerF.post('/getRealTimeData', async (req, res) => {
                 "status": `${device.status}` || null,
                 "power": "25" || null,
                 "today_energy": `${currentData.datas.find(e => e.variable === "todayYield")?.value}` || null,
-                "date": currentData.time || null,
+                "date": `${Math.floor(new Date(currentData.time.slice(0,-9)).getTime() / 1000)}` || null,
                 "export_energy": `${currentData.datas.find(e => e.variable === "generationPower")?.value}` || null,
                 "import_energy": null,
                 "differ_voltage_ab": `${currentData.datas.find(e => e.variable === "RVolt")?.value}` || null,
