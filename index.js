@@ -5,6 +5,7 @@ const routerS = require('./router/solarman');
 const routerH = require('./router/hopecloud');
 const routerF = require("./router/foxess");
 const routerU = require("./router/ung");
+const routerAll = require("./router/all");
 const app = express();
 const port = 8080;
 
@@ -25,6 +26,7 @@ app.use("/solarman", bodyParser.json(), routerS);
 app.use("/hopecloud", bodyParser.json(), routerH);
 app.use("/foxess", bodyParser.json(), routerF);
 app.use("/ung", bodyParser.json(), routerU);
+app.use("/all", bodyParser.json(), routerAll);
 app.listen(port, () => {
     console.log(`express server is working successfully ${port}`)
 })
