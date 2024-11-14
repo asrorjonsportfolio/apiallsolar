@@ -5,7 +5,7 @@ const routerS = require('./router/solarman');
 const routerH = require('./router/hopecloud');
 const routerF = require("./router/foxess");
 const routerU = require("./router/ung");
-const routerAll = require("./router/all");
+const routerAll = require("./router/alltest");
 const app = express();
 const port = 8080;
 
