@@ -22,14 +22,14 @@ routerH.post('/login', (req, res) => {
 routerH.post('/getStationList', (req, res) => {
     getStationList()
         .then((response) => {
-            res.status(200).send({data: response.result.records});
+            res.status(200).send(response.result.records);
         })
         .catch(error => res.status(401).send({msg: 'hopecloud getstationlist error', error}));
 });
 routerH.post('/getDeviceList', (req, res) => {
     getDeviceList()
         .then((response) => {
-            res.status(200).send({data: response.result});
+            res.status(200).send(response.result.records);
         })
         .catch(error => res.status(401).send({msg: `hopecloud getdevicelist error`, err: error}));
 });
@@ -69,9 +69,9 @@ routerH.post('/getPowerCapacityByUserId', (req, res) => {
         .catch(error => console.log('getpowercapacity error', error));
 });
 routerH.post('/getRealTimeData', async (req, res) => {
-    const {sn} = req.body;
+    const {deviceSn} = req.body;
     let AC, DC, currentData, deviceList;
-
+    let sn = deviceSn;
     try {
         // Fetch current data
         const currentDataResult = await getCurrentData(sn);
@@ -100,37 +100,36 @@ routerH.post('/getRealTimeData', async (req, res) => {
 
             // Send response with data
             res.status(200).send({
-                "type": "HOPEWIND",
+                "type": "HOPEWIND" || null,
                 "hybrid": false,
-                "station_name": `${deviceInfo?.powerPlantName}` || "",
-                "station_id": `${deviceInfo?.powerPlantId}` || "",
-                "inverter_name": `${deviceInfo?.name}` || "",
-                "inverter_sn": `${sn}`,
-                "status": `${deviceInfo?.deviceStatus}` || "",
-                "power": `${info.find(e => e.paramName === "Rated Power")?.paramValue.slice(0, -2)}` || "0",
-                "today_energy": `${overview.find(e => e.paramName === "Today Yield")?.paramValue.slice(0, -3)}` || "0",
-                "energy_change": "",
-                "date": `${info.find(e => e.paramName === "Current date-time")?.paramValue}` || "",
-                "export_energy": `${overview.find(e => e.paramName === "AC active power")?.paramValue.slice(0, -2)}` || "0",
-                "import_energy": "0",
-                "differ_voltage_ab": `${AC.find(e => e.name === "A-phase")?.voltage}` || "0",
-                "differ_voltage_bc": `${AC.find(e => e.name === "B-phase")?.voltage}` || "0",
-                "differ_voltage_ac": `${AC.find(e => e.name === "C-phase")?.voltage}` || "0",
-                "temperature": `${overview.find(e => e.paramName === "Internal temperature")?.paramValue.slice(0, -2)}` || "0",
-                "alarm_code": `${alarm.find(e => e.paramName === "Alarm code")?.paramValue}` || "",
-                "pv1": `${DC.find(e => e.mpptName === "MPPT1")?.voltage}` || "0",
-                "pv2": `${DC.find(e => e.mpptName === "MPPT2")?.voltage}` || "0",
-                "pv3": `${DC.find(e => e.mpptName === "MPPT3")?.voltage}` || "0",
-                "pv4": `${DC.find(e => e.mpptName === "MPPT4")?.voltage}` || "0",
-                "pv5": `${DC.find(e => e.mpptName === "MPPT5")?.voltage}` || "0",
-                "pv6": `${DC.find(e => e.mpptName === "MPPT6")?.voltage}` || "0",
-                "pv7": `${DC.find(e => e.mpptName === "MPPT7")?.voltage}` || "0",
-                "pv8": `${DC.find(e => e.mpptName === "MPPT8")?.voltage}` || "0",
-                "pv9": `${DC.find(e => e.mpptName === "MPPT9")?.voltage}` || "0",
-                "pv10": `${DC.find(e => e.mpptName === "MPPT10")?.voltage}` || "0",
-                "pv11": `${DC.find(e => e.mpptName === "MPPT11")?.voltage}` || "0",
-                "pv12": `${DC.find(e => e.mpptName === "MPPT12")?.voltage}` || "0",
-                "total_yield_energy": `${overview.find(e => e.paramName === "Total Yield")?.paramValue.slice(0. - 3)}` || "0",
+                "station_name": `${deviceInfo?.powerPlantName}` || null,
+                "station_id": `${deviceInfo?.powerPlantId}` || null,
+                "inverter_name": `${deviceInfo?.name}` || null,
+                "inverter_sn": `${sn}` || null,
+                "status": `${deviceInfo?.deviceStatus}` || null,
+                "power": `${info.find(e => e.paramName === "Rated Power")?.paramValue.slice(0, -2)}` || null,
+                "today_energy": `${overview.find(e => e.paramName === "Today Yield")?.paramValue.slice(0, -3)}` || null,
+                "date": `${info.find(e => e.paramName === "Current date-time")?.paramValue}` || null,
+                "export_energy": `${overview.find(e => e.paramName === "AC active power")?.paramValue.slice(0, -2)}` || null,
+                "import_energy": null,
+                "differ_voltage_ab": `${AC.find(e => e.name === "A-phase")?.voltage}` || null,
+                "differ_voltage_bc": `${AC.find(e => e.name === "B-phase")?.voltage}` || null,
+                "differ_voltage_ac": `${AC.find(e => e.name === "C-phase")?.voltage}` || null,
+                "temperature": `${overview.find(e => e.paramName === "Internal temperature")?.paramValue.slice(0, -2)}` || null,
+                "alarm_code": `${alarm.find(e => e.paramName === "Alarm code")?.paramValue}` || null,
+                "pv1": DC.find(e => e.mpptName === "MPPT1")?.voltage.toString() || null,
+                "pv2": DC.find(e => e.mpptName === "MPPT2")?.voltage.toString() || null,
+                "pv3": DC.find(e => e.mpptName === "MPPT3")?.voltage.toString() || null,
+                "pv4": DC.find(e => e.mpptName === "MPPT4")?.voltage.toString() || null,
+                "pv5": DC.find(e => e.mpptName === "MPPT5")?.voltage.toString() || null,
+                "pv6": DC.find(e => e.mpptName === "MPPT6")?.voltage.toString() || null,
+                "pv7": DC.find(e => e.mpptName === "MPPT7")?.voltage.toString() || null,
+                "pv8": DC.find(e => e.mpptName === "MPPT8")?.voltage.toString() || null,
+                "pv9": DC.find(e => e.mpptName === "MPPT9")?.voltage.toString() || null,
+                "pv10": DC.find(e => e.mpptName === "MPPT10")?.voltage.toString() || null,
+                "pv11": DC.find(e => e.mpptName === "MPPT11")?.voltage.toString() || null,
+                "pv12": DC.find(e => e.mpptName === "MPPT12")?.voltage.toString() || null,
+                "total_yield_energy": `${overview.find(e => e.paramName === "Total Yield")?.paramValue.slice(0, -3)}` || null,
             });
         }
     } catch (error) {
