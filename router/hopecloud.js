@@ -69,7 +69,7 @@ routerH.post('/getPowerCapacityByUserId', (req, res) => {
         .catch(error => console.log('getpowercapacity error', error));
 });
 routerH.post('/getRealTimeData', async (req, res) => {
-    const {sn} = req.body;
+    const {sn} = await req.body;
     let AC, DC, currentData, deviceList;
     try {
         // Fetch current data
