@@ -69,9 +69,8 @@ routerH.post('/getPowerCapacityByUserId', (req, res) => {
         .catch(error => console.log('getpowercapacity error', error));
 });
 routerH.post('/getRealTimeData', async (req, res) => {
-    const {deviceSn} = req.body;
+    const {sn} = req.body;
     let AC, DC, currentData, deviceList;
-    let sn = deviceSn;
     try {
         // Fetch current data
         const currentDataResult = await getCurrentData(sn);
@@ -94,7 +93,7 @@ routerH.post('/getRealTimeData', async (req, res) => {
 
             // Extract relevant data
             let overview = currentData.find(e => e.i18nKey === "Overview").paramList;
-            let info = currentData.find(e => e.i18nKey === "System Information").paramList;
+            let info = currentData.find(e => e.i18nKey === "System information").paramList;
             let alarm = currentData.find(e => e.i18nKey === "Fault alarm").paramList;
             const deviceInfo = deviceList.find(e => e.sn === sn);
 
