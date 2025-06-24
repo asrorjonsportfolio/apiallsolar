@@ -93,7 +93,7 @@ routerH.post('/getRealTimeData', async (req, res) => {
             deviceList = deviceListResult.result.records;
 
             // Extract relevant data
-            let overview = currentData.find(e => e.i18nKey === "Overview").paramList;
+            let overview = currentData.find(e => e.i18nKey === "Overview information").paramList;
             let info = currentData.find(e => e.i18nKey === "System information").paramList;
             let alarm = currentData.find(e => e.i18nKey === "Fault alarm").paramList;
             const deviceInfo = deviceList.find(e => e.sn === sn);
